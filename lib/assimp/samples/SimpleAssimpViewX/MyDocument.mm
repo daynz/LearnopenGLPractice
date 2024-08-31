@@ -82,7 +82,7 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink,const CVTimeS
     
     _glContext = [[NSOpenGLContext alloc] initWithFormat:_glPixelFormat shareContext:nil];
     
-    const GLint one = 1;
+    const int one = 1;
     
     [_glContext setValues:&one forParameter:NSOpenGLCPSwapInterval];
     [_glContext setView:_view];

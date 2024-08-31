@@ -7,7 +7,7 @@ Texture2D::Texture2D()
 	glGenTextures(1, &this->m_ID);
 }
 
-void Texture2D::Generate(GLuint width, GLuint height,unsigned char* data)
+void Texture2D::Generate(unsigned int width, unsigned int height,unsigned char* data)
 {
 	this->m_Width = width;
 	this->m_Height = height;
@@ -28,47 +28,47 @@ void Texture2D::Bind() const
 	glBindTexture(GL_TEXTURE_2D, this->m_ID);
 }
 
-GLuint Texture2D::ID() const
+unsigned int Texture2D::ID() const
 {
 	return m_ID;
 }
 
-GLuint Texture2D::Width() const
+unsigned int Texture2D::Width() const
 {
 	return m_Width;
 }
 
-GLuint Texture2D::Height() const
+unsigned int Texture2D::Height() const
 {
 	return m_Height;
 }
 
-GLuint Texture2D::Internal_Format() const
+unsigned int Texture2D::Internal_Format() const
 {
 	return m_Internal_Format;
 }
 
-GLuint Texture2D::Image_Format() const
+unsigned int Texture2D::Image_Format() const
 {
 	return m_Image_Format;
 }
 
-GLuint Texture2D::Wrap_S() const
+unsigned int Texture2D::Wrap_S() const
 {
 	return m_Wrap_S;
 }
 
-GLuint Texture2D::Wrap_T() const
+unsigned int Texture2D::Wrap_T() const
 {
 	return m_Wrap_T;
 }
 
-GLuint Texture2D::Filter_Min() const
+unsigned int Texture2D::Filter_Min() const
 {
 	return m_Filter_Min;
 }
 
-GLuint Texture2D::Filter_Max() const
+unsigned int Texture2D::Filter_Max() const
 {
 	return m_Filter_Max;
 }

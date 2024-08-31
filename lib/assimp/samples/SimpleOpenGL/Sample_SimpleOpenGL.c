@@ -273,8 +273,8 @@ void recursive_render (const C_STRUCT aiScene *sc, const C_STRUCT aiNode* nd)
 /* ---------------------------------------------------------------------------- */
 void do_motion (void)
 {
-	static GLint prev_time = 0;
-	static GLint prev_fps_time = 0;
+	static int prev_time = 0;
+	static int prev_fps_time = 0;
 	static int frames = 0;
 
 	int time = glutGet(GLUT_ELAPSED_TIME);

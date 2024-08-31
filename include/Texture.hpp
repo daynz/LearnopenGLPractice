@@ -6,26 +6,26 @@ class Texture2D
 public:
 	Texture2D();
 	
-	void Generate(GLuint width, GLuint height, unsigned char* data);
+	void Generate(unsigned int width, unsigned int height, unsigned char* data);
 	
 	void Bind() const;
 
-	GLuint ID() const;
-	GLuint Width()const;
-	GLuint Height()const;
-	GLuint Internal_Format()const;
-	GLuint Image_Format()const;
-	GLuint Wrap_S()const;
-	GLuint Wrap_T()const;
-	GLuint Filter_Min()const;
-	GLuint Filter_Max()const;
+	unsigned int ID() const;
+	unsigned int Width()const;
+	unsigned int Height()const;
+	unsigned int Internal_Format()const;
+	unsigned int Image_Format()const;
+	unsigned int Wrap_S()const;
+	unsigned int Wrap_T()const;
+	unsigned int Filter_Min()const;
+	unsigned int Filter_Max()const;
 
-	GLuint m_ID;
-	GLuint m_Width, m_Height;
-	GLuint m_Internal_Format;
-	GLuint m_Image_Format;
-	GLuint m_Wrap_S;
-	GLuint m_Wrap_T;
-	GLuint m_Filter_Min;
-	GLuint m_Filter_Max;
+	unsigned int m_ID;
+	unsigned int m_Width, m_Height;
+	unsigned int m_Internal_Format;
+	unsigned int m_Image_Format;
+	unsigned int m_Wrap_S;
+	unsigned int m_Wrap_T;
+	unsigned int m_Filter_Min;
+	unsigned int m_Filter_Max;
 };

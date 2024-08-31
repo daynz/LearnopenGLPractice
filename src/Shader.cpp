@@ -11,9 +11,9 @@ Shader& Shader::use()
 	return *this;
 }
 
-void Shader::compile(const GLchar* vertexSource, const GLchar* fragmentSource, const GLchar* geometrySource /*= nullptr*/)
+void Shader::compile(const char* vertexSource, const char* fragmentSource, const char* geometrySource)
 {
-	GLuint sVertex, sFragment, gShader;
+	unsigned int sVertex, sFragment, gShader;
 	// Vertex Shader
 	sVertex = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(sVertex, 1, &vertexSource, NULL);
@@ -102,10 +102,10 @@ void Shader::SetMatrix4(const char* name, const glm::mat4& matrix, bool useShade
 }
 
 
-void Shader::checkCompileErrors(GLuint object, std::string type)
+void Shader::checkCompileErrors(unsigned int object, std::string type)
 {
-	GLint success;
-	GLchar infoLog[1024];
+	int success;
+	char infoLog[1024];
 	if (type != "PROGRAM")
 	{
 		glGetShaderiv(object, GL_COMPILE_STATUS, &success);

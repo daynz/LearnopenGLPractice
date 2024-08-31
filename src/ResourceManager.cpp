@@ -5,7 +5,7 @@
 std::map<std::string, Shader> ResourceManager::m_shader;
 std::map<std::string, Texture2D> ResourceManager::m_texture;
 
-Shader ResourceManager::loadShader(const GLchar* vShaderFile, const GLchar* fShaderFile, const GLchar* gShaderFile, std::string name)
+Shader ResourceManager::loadShader(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile, std::string name)
 {
 	m_shader[name] = loadShaderFromFile(vShaderFile, fShaderFile, gShaderFile);
 	return m_shader[name];
@@ -16,7 +16,7 @@ Shader ResourceManager::getShader(std::string name)
 	return m_shader[name];
 }
 
-Texture2D ResourceManager::loadTexture(const GLchar* file, GLboolean alpha, std::string name)
+Texture2D ResourceManager::loadTexture(const char* file, bool alpha, std::string name)
 {
 	m_texture[name] = loadTextureFromFile(file, alpha);
 	return m_texture[name];
@@ -39,7 +39,7 @@ void ResourceManager::clear()
 	}
 }
 
-Shader ResourceManager::loadShaderFromFile(const GLchar* vShaderFile, const GLchar* fShaderFile, const GLchar* gShaderFile /*= nullptr*/)
+Shader ResourceManager::loadShaderFromFile(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile /*= nullptr*/)
 {
 	// 1. Retrieve the vertex/fragment source code from filePath
 	std::string vertexCode;
@@ -74,16 +74,16 @@ Shader ResourceManager::loadShaderFromFile(const GLchar* vShaderFile, const GLch
 	{
 		std::cout << "ERROR::SHADER: Failed to read shader files" << std::endl;
 	}
-	const GLchar* vShaderCode = vertexCode.c_str();
-	const GLchar* fShaderCode = fragmentCode.c_str();
-	const GLchar* gShaderCode = geometryCode.c_str();
+	const char* vShaderCode = vertexCode.c_str();
+	const char* fShaderCode = fragmentCode.c_str();
+	const char* gShaderCode = geometryCode.c_str();
 	// 2. Now create shader object from source code
 	Shader shader;
 	shader.compile(vShaderCode, fShaderCode, gShaderFile != nullptr ? gShaderCode : nullptr);
 	return shader;
 }
 
-Texture2D ResourceManager::loadTextureFromFile(const GLchar* file, GLboolean alpha)
+Texture2D ResourceManager::loadTextureFromFile(const char* file, bool alpha)
 {
 	// Create Texture object
 	Texture2D texture;
@@ -95,6 +95,10 @@ Texture2D ResourceManager::loadTextureFromFile(const GLchar* file, GLboolean alp
 	// Load image
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
+	if (!data)
+	{
+		std::cout << "texture load error" << std::endl;
+	}
 	// Now generate texture
 	texture.Generate(width, height, data);
 	// And finally free image data

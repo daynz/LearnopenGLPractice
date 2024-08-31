@@ -7,7 +7,7 @@ class Shader
 public:
 	Shader();
 	Shader& use();
-	GLuint ID()const { return m_ID; }
+	unsigned int ID()const { return m_ID; }
 	void compile(const char* vertexSource, const char* fragmentSource, const char* geometrySource = nullptr);
 	void SetFloat(const char* name, float value, bool useShader = false);
 	void SetInteger(const char* name, int value, bool useShader = false);
@@ -19,7 +19,7 @@ public:
 	void SetVector4f(const char* name, const glm::vec4& value, bool useShader = false);
 	void SetMatrix4(const char* name, const glm::mat4& matrix, bool useShader = false);
 
-	GLuint m_ID;
-	void checkCompileErrors(GLuint object, std::string type);
+	unsigned int m_ID;
+	void checkCompileErrors(unsigned int object, std::string type);
 };
 

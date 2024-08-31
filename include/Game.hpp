@@ -2,6 +2,7 @@
 
 #include "HeadFile.hpp"
 #include "ResourceManager.hpp"
+#include "SpriteRenderer.hpp"
 
 enum GameStats
 {
@@ -13,7 +14,7 @@ enum GameStats
 class Game
 {
 public:
-	Game(GLuint width,GLuint height);
+	Game(int width,int height);
 	~Game();
 	void init();
 	void processInput(float dt);
@@ -21,6 +22,6 @@ public:
 	void render();
 
 	GameStats m_state;
-	GLboolean m_Keys[1024];
-	GLuint m_Width, m_Height;
+	bool m_Keys[1024];
+	int m_Width, m_Height;
 };
