@@ -3,6 +3,8 @@
 #include "HeadFile.hpp"
 #include "ResourceManager.hpp"
 #include "SpriteRenderer.hpp"
+#include "GameObject.hpp"
+#include "GameLevel.hpp"
 
 enum GameStats
 {
@@ -24,4 +26,6 @@ public:
 	GameStats m_state;
 	bool m_Keys[1024];
 	int m_Width, m_Height;
+	std::vector<GameLevel> m_Levels;
+	unsigned int m_Level;
 };
