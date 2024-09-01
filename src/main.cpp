@@ -43,6 +43,7 @@ int main()
 		lastFrame = currentFrame;
 
         Breakout.render();
+        Breakout.updata(deltaTime);
 
         Breakout.processInput(deltaTime);
 

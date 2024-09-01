@@ -5,6 +5,7 @@
 #include "SpriteRenderer.hpp"
 #include "GameObject.hpp"
 #include "GameLevel.hpp"
+#include "BallObject.hpp"
 
 enum GameStats
 {
