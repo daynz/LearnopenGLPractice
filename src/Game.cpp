@@ -4,6 +4,11 @@ SpriteRenderer* Renderer;
 GameObject* Player;
 BallObject* Ball;
 ParticleGenerator* Particles;
+PostProcessor* Effects;
+
+float ShakeTime = 0.0f;
+bool isConfused = false;
+bool isChao = false;
 
 Game::Game(int width, int height)
 	:m_state(GAME_ACTIVE),m_Keys(),m_Width(width),m_Height(height)
@@ -17,12 +22,14 @@ Game::~Game()
 	delete Player;
 	delete Ball;
 	delete Particles;
+	delete Effects;
 }
 
 void Game::init()
 {
 	ResourceManager::loadShader("../shader/spritev.glsl", "../shader/spritef.glsl", nullptr, "sprite");
 	ResourceManager::loadShader("../shader/particlev.glsl", "../shader/particlef.glsl", nullptr, "particle");
+	ResourceManager::loadShader("../shader/postprocessingv.glsl", "../shader/postprocessingf.glsl", nullptr, "postprocessing");
 
 	glm::mat4 projection = glm::ortho(0.0f, (float)this->m_Width, (float)this->m_Height, 0.0f, -1.0f, 1.0f);
 	ResourceManager::getShader("sprite").use().SetInteger("image", 0);
@@ -38,11 +45,8 @@ void Game::init()
 	ResourceManager::loadTexture("../assets/texture/particle.png", true, "particle");
 
 	Renderer = new SpriteRenderer(ResourceManager::getShader("sprite"));
-	Particles = new ParticleGenerator(
-		ResourceManager::getShader("particle"),
-		ResourceManager::getTexture("particle"),
-		500
-	);
+	Particles = new ParticleGenerator(ResourceManager::getShader("particle"), ResourceManager::getTexture("particle"), 500);
+	Effects = new PostProcessor(ResourceManager::getShader("postprocessing"), this->m_Width, this->m_Height);
 
 	GameLevel one;
 	one.load("../level/one.lvl", this->m_Width, this->m_Height / 2);
@@ -60,7 +64,6 @@ void Game::init()
 
 	glm::vec2 playerPos = glm::vec2(this->m_Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->m_Height - PLAYER_SIZE.y);
 	Player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::getTexture("paddle"));
-
 	glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
 	Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("face"));
 }
@@ -101,6 +104,33 @@ void Game::processInput(float dt)
 		{
 			Ball->reset(Player->m_position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f), INITIAL_BALL_VELOCITY);
 		}
+		if (this->m_Keys[GLFW_KEY_1])
+		{
+			if (isConfused)
+			{
+				Effects->Confuse = true;
+				isConfused = false;
+			}
+			else
+			{
+				Effects->Confuse = false;
+				isConfused = true;
+			}
+		}
+		
+		if (this->m_Keys[GLFW_KEY_2])
+		{
+			if (isChao)
+			{
+				Effects->Chaos = true;
+				isChao = false;
+			}
+			else
+			{
+				Effects->Chaos = false;
+				isChao = true;
+			}
+		}
 	}
 }
 
@@ -109,18 +139,31 @@ void Game::updata(float dt)
 	Ball->move(dt, this->m_Width);
 	this->doCollisions();
 	Particles->updata(dt, *Ball, 2, glm::vec2(Ball->m_Radius / 2.0f));
+
+	if (ShakeTime > 0.0f)
+	{
+		ShakeTime -= dt;
+		if (ShakeTime <= 0.0f)
+		{
+			Effects->Shake = false;
+		}
+	}
 }
 
 void Game::render()
 {
 	if (this->m_state == GAME_ACTIVE)
 	{
+		Effects->BeginRender();
 		//Renderer->DrawSprite(ResourceManager::getTexture("face"), glm::vec2(200, 200), glm::vec2(300, 400), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		Renderer->DrawSprite(ResourceManager::getTexture("background"), glm::vec2(0.0f, 0.0f), glm::vec2(this->m_Width, this->m_Height), 0.0f);
 		this->m_Levels[this->m_Level].draw(*Renderer);
 		Player->Draw(*Renderer);
 		Particles->Draw();
 		Ball->Draw(*Renderer);
+
+		Effects->EndRender();
+		Effects->Render(glfwGetTime());
 	}
 }
 
@@ -130,20 +173,19 @@ void Game::doCollisions()
 	{
 		if (!box.m_destroyed)
 		{
-			////if (checkCollision(*Ball,box))
-			//if(checkCollisionCircle(*Ball, box))
-			//{
-			//	if (!box.m_isSolid)
-			//	{
-			//		box.m_destroyed = true;
-			//	}
-			//}
 			Collision collision = checkCollisionCircle(*Ball, box);
 			if (std::get<0>(collision))
 			{
 				if (!box.m_isSolid)
 				{
 					box.m_destroyed = true;
+					ShakeTime = 0.2f;
+					Effects->Shake = true;
+				}
+				else
+				{
+					ShakeTime = 0.05f;
+					Effects->Shake = true;
 				}
 				Direction dir = std::get<1>(collision);
 				glm::vec2 diff_vector = std::get<2>(collision);
@@ -185,8 +227,9 @@ void Game::doCollisions()
 		float strength = 2.0f;
 		glm::vec2 oldVelocity = Ball->m_velocity;
 		Ball->m_velocity.x = INITIAL_BALL_VELOCITY.x * percentage * strength;
-		Ball->m_velocity.y = -Ball->m_velocity.y;
+		//Ball->m_velocity.y = -Ball->m_velocity.y;
 		Ball->m_velocity = glm::normalize(Ball->m_velocity) * glm::length(oldVelocity);
+		Ball->m_velocity.y = -1.0f * abs(Ball->m_velocity.y);
 	}
 }
 

@@ -7,6 +7,7 @@
 #include "GameLevel.hpp"
 #include "BallObject.hpp"
 #include "ParticleGenerator.hpp"
+#include "PostProcessor.hpp"
 
 enum GameStats
 {
