@@ -6,6 +6,7 @@
 #include "GameObject.hpp"
 #include "GameLevel.hpp"
 #include "BallObject.hpp"
+#include "ParticleGenerator.hpp"
 
 enum GameStats
 {
