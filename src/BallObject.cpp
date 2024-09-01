@@ -38,7 +38,6 @@ glm::vec2 BallObject::move(float dt, unsigned int window_width)
 			this->m_position.y = 0.0f;
 		}
 	}
-	std::cout << m_Stuck << std::endl;
 	return this->m_position;
 }
 

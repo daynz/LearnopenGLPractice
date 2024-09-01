@@ -12,6 +12,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <tuple>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
