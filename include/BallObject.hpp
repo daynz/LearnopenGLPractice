@@ -11,6 +11,7 @@ public:
 	
 	float m_Radius;
 	bool m_Stuck;
+	bool m_Sticky, m_PassThrough;
 
 	glm::vec2 move(float dt, unsigned int window_width);
 	void reset(glm::vec2 position, glm::vec2 velocity);

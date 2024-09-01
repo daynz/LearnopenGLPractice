@@ -8,6 +8,7 @@
 #include "BallObject.hpp"
 #include "ParticleGenerator.hpp"
 #include "PostProcessor.hpp"
+#include "PowerUp.hpp"
 
 enum GameStats
 {
@@ -41,14 +42,17 @@ public:
 	void updata(float dt);
 	void render();
 	void doCollisions();
-	bool checkCollision(BallObject& one, GameObject& two);
+	bool checkCollision(GameObject& one, GameObject& two);
 	Collision checkCollisionCircle(BallObject& one, GameObject& two);
 	inline float clamp(float value, float min, float max);
 	Direction VectorDirection(glm::vec2 target);
+	void spawnPowerUps(GameObject& block);
+	void updataPowerUps(float dt);
 
 	GameStats m_state;
 	bool m_Keys[1024];
 	int m_Width, m_Height;
 	std::vector<GameLevel> m_Levels;
 	unsigned int m_Level;
+	std::vector<PowerUp> PowerUps;
 };
