@@ -1,10 +1,12 @@
 #include "Game.hpp"
+#include <irrKlang.h>
 
 SpriteRenderer* Renderer;
 GameObject* Player;
 BallObject* Ball;
 ParticleGenerator* Particles;
 PostProcessor* Effects;
+irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 
 float ShakeTime = 0.0f;
 bool isConfused = false;
@@ -67,6 +69,8 @@ void Game::init()
 	this->m_Levels.push_back(three);
 	this->m_Levels.push_back(four);
 	this->m_Level = 0;
+
+	SoundEngine->play2D("../assets/audio/breakout.mp3", true);
 
 	glm::vec2 playerPos = glm::vec2(this->m_Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->m_Height - PLAYER_SIZE.y);
 	Player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::getTexture("paddle"));
@@ -229,11 +233,13 @@ void Game::doCollisions()
 					ShakeTime = 0.2f;
 					Effects->Shake = true;
 					this->spawnPowerUps(box);
+					SoundEngine->play2D("../assets/audio/bleep.mp3", false);
 				}
 				else
 				{
 					ShakeTime = 0.05f;
 					Effects->Shake = true;
+					SoundEngine->play2D("../assets/audio/solid.wav", false);
 				}
 				Direction dir = std::get<1>(collision);
 				glm::vec2 diff_vector = std::get<2>(collision);
@@ -281,6 +287,7 @@ void Game::doCollisions()
 				ActivatePowerUp(powerUp);
 				powerUp.m_destroyed = true;
 				powerUp.Activated = true;
+				SoundEngine->play2D("../assets/audio/powerup.wav", false);
 			}
 		}
 	}
@@ -298,6 +305,8 @@ void Game::doCollisions()
 		Ball->m_velocity = glm::normalize(Ball->m_velocity) * glm::length(oldVelocity);
 		Ball->m_velocity.y = -1.0f * abs(Ball->m_velocity.y);
 		Ball->m_Stuck = Ball->m_Sticky;
+
+		SoundEngine->play2D("../assets/audio/bleep.wav");
 	}
 }
 
