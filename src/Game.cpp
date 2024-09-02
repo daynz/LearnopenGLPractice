@@ -7,13 +7,14 @@ BallObject* Ball;
 ParticleGenerator* Particles;
 PostProcessor* Effects;
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
+TextRenderer* Text;
 
 float ShakeTime = 0.0f;
 bool isConfused = false;
 bool isChao = false;
 
-Game::Game(int width, int height)
-	:m_state(GAME_ACTIVE),m_Keys(),m_Width(width),m_Height(height)
+Game::Game(int m_Width, int height)
+	:m_state(GAME_MENU),m_Keys(),m_Width(m_Width),m_Height(height)
 {
 	
 }
@@ -25,6 +26,8 @@ Game::~Game()
 	delete Ball;
 	delete Particles;
 	delete Effects;
+	delete Text;
+	SoundEngine->drop();
 }
 
 void Game::init()
@@ -69,8 +72,12 @@ void Game::init()
 	this->m_Levels.push_back(three);
 	this->m_Levels.push_back(four);
 	this->m_Level = 0;
+	this->m_Lives = 3;
 
 	SoundEngine->play2D("../assets/audio/breakout.mp3", true);
+
+	Text = new TextRenderer(this->m_Width, this->m_Height);
+	Text->load("../assets/font/ocraext.TTF", 24);
 
 	glm::vec2 playerPos = glm::vec2(this->m_Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->m_Height - PLAYER_SIZE.y);
 	Player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::getTexture("paddle"));
@@ -127,7 +134,6 @@ void Game::processInput(float dt)
 				isConfused = true;
 			}
 		}
-		
 		if (this->m_Keys[GLFW_KEY_2])
 		{
 			if (isChao)
@@ -141,7 +147,69 @@ void Game::processInput(float dt)
 				isChao = true;
 			}
 		}
+		if (this->m_Keys[GLFW_KEY_P])
+		{
+			this->m_state = GAME_WIN;
+		}
 	}
+	if (this->m_state == GAME_MENU)
+	{
+		if (this->m_Keys[GLFW_KEY_ENTER] && !this->m_KeyProcessed[GLFW_KEY_ENTER])
+		{
+			this->m_state = GAME_ACTIVE;
+			this->m_KeyProcessed[GLFW_KEY_ENTER] = true;
+		}
+		if (this->m_Keys[GLFW_KEY_W] && !this->m_KeyProcessed[GLFW_KEY_W])
+		{
+			this->m_Level = (this->m_Level + 1) % 4;
+			this->m_KeyProcessed[GLFW_KEY_W] = true;
+		}
+		if (this->m_Keys[GLFW_KEY_S] && !this->m_KeyProcessed[GLFW_KEY_S])
+		{
+			if (this->m_Level > 0)
+				--this->m_Level;
+			else
+				this->m_Level = 3;
+			this->m_Level = (this->m_Level - 1) % 4;
+			this->m_KeyProcessed[GLFW_KEY_S] = true;
+		}
+	}
+	if (this->m_state == GAME_WIN)
+	{
+		if (this->m_Keys[GLFW_KEY_ENTER])
+		{
+			this->m_KeyProcessed[GLFW_KEY_ENTER] = true;
+			Effects->Chaos = false;
+			this->m_state = GAME_MENU;
+		}
+	}
+}
+
+void Game::resetLevel()
+{
+	if (this->m_Level == 0)
+		this->m_Levels[0].load("../level/one.lvl", this->m_Width, this->m_Height / 2);
+	else if (this->m_Level == 1)
+		this->m_Levels[1].load("../level/two.lvl", this->m_Width, this->m_Height / 2);
+	else if (this->m_Level == 2)
+		this->m_Levels[2].load("../level/three.lvl", this->m_Width, this->m_Height / 2);
+	else if (this->m_Level == 3)
+		this->m_Levels[3].load("../level/four.lvl", this->m_Width, this->m_Height / 2);
+
+	this->m_Lives = 3;
+}
+
+void Game::resetPlayer()
+{
+	// reset player/ball stats
+	Player->m_size = PLAYER_SIZE;
+	Player->m_position = glm::vec2(this->m_Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->m_Height - PLAYER_SIZE.y);
+	Ball->reset(Player->m_position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
+	// also disable all active powerups
+	Effects->Chaos = Effects->Confuse = false;
+	Ball->m_PassThrough = Ball->m_Sticky = false;
+	Player->m_color = glm::vec3(1.0f);
+	Ball->m_color = glm::vec3(1.0f);
 }
 
 void Game::updata(float dt)
@@ -159,11 +227,29 @@ void Game::updata(float dt)
 			Effects->Shake = false;
 		}
 	}
+
+	if (Ball->m_position.y >= this->m_Height)
+	{
+		--this->m_Lives;
+		if (this->m_Lives == 0)
+		{
+			this->resetLevel();
+			this->m_state = GAME_MENU;
+		}
+		this->resetPlayer();
+	}
+	if (this->m_state == GAME_ACTIVE && this->m_Levels[this->m_Level].isCompleted())
+	{
+		this->resetLevel();
+		this->resetPlayer();
+		Effects->Chaos = true;
+		this->m_state = GAME_WIN;
+	}
 }
 
 void Game::render()
 {
-	if (this->m_state == GAME_ACTIVE)
+	if (this->m_state == GAME_ACTIVE || this->m_state == GAME_MENU || this->m_state == GAME_WIN)
 	{
 		Effects->BeginRender();
 		//Renderer->DrawSprite(ResourceManager::getTexture("face"), glm::vec2(200, 200), glm::vec2(300, 400), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -182,6 +268,19 @@ void Game::render()
 
 		Effects->EndRender();
 		Effects->Render(glfwGetTime());
+
+		std::stringstream ss; ss << this->m_Lives;
+		Text->renderText("Lives:" + ss.str(), 5.0f, 5.0f, 1.0f);
+	}
+	if (this->m_state == GAME_MENU)
+	{
+		Text->renderText("Press ENTER to start", 250.0f, this->m_Height / 2.0f, 1.0f);
+		Text->renderText("Press W or S to select level", 245.0f, this->m_Height / 2.0f + 20.0f, 0.75f);
+	}
+	if (this->m_state == GAME_WIN)
+	{
+		Text->renderText("You WON!!!", 320.0f, this->m_Height / 2.0f - 20.0f, 1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		Text->renderText("Press ENTER to retry or ESC to quit", 130.0f, this->m_Height / 2.0f, 1.0f, glm::vec3(1.0f, 1.0f, 0.0f));
 	}
 }
 

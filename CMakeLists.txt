@@ -7,11 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(include)
 include_directories(lib/irrKlang/include)
+include_directories(lib/freetype/include)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS src/*.cpp)
-#link_libraries(D:/Study/Project/opengltutor/LearnopenGLPractice/lib/irrKlang/lib/Winx64-visualStudio)
 
 add_executable(${PROJECT_NAME} ${SRC})
 
@@ -24,3 +24,4 @@ target_link_libraries(${PROJECT_NAME} PUBLIC glm)
 add_subdirectory(lib/assimp)
 target_link_libraries(${PROJECT_NAME} PUBLIC assimp)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/lib/irrKlang/lib/Winx64-visualStudio/irrKlang.lib)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/lib/freetype/objs/freetype.lib)

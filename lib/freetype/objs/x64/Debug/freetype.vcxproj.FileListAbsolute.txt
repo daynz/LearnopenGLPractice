@@ -1,0 +1,1 @@
+D:\Study\Project\opengltutor\LearnopenGLPractice\lib\freetype\objs\x64\Debug\freetype.dll

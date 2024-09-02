@@ -9,6 +9,7 @@
 #include "ParticleGenerator.hpp"
 #include "PostProcessor.hpp"
 #include "PowerUp.hpp"
+#include "TextRenderer.hpp"
 
 enum GameStats
 {
@@ -48,11 +49,15 @@ public:
 	Direction VectorDirection(glm::vec2 target);
 	void spawnPowerUps(GameObject& block);
 	void updataPowerUps(float dt);
+	void resetLevel();
+	void resetPlayer();
 
 	GameStats m_state;
 	bool m_Keys[1024];
+	bool m_KeyProcessed[1024];
 	int m_Width, m_Height;
 	std::vector<GameLevel> m_Levels;
 	unsigned int m_Level;
 	std::vector<PowerUp> PowerUps;
+	unsigned int m_Lives;
 };
